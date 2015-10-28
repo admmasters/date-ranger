@@ -4,7 +4,8 @@
   "description": "A simple utility that takes two dates and manages their deltas based upon some input parameters.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "build": "jstransform --strip-types --harmony --watch src/ build/",
+    "test": "mocha build/index.test.js -w"
   },
   "repository": {
     "type": "git",
