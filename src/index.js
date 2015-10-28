@@ -16,19 +16,20 @@ const moment : moment.MomentStatic = require('moment');
  */
 function dateRanger( options ) {
 
-  let initialDate = moment( options.startDate || new Date());
-  let initialEndDate = moment( options.endDate || new Date());
-  let delta = options.minDelta;
+  let passedOptions = options || {};
+
+  let initialDate = moment( passedOptions.startDate || new Date());
+  let initialEndDate = moment( passedOptions.endDate || new Date());
+  let delta = passedOptions.minDelta;
 
   let rangeTransformedDate = ( newDate )=> {
 
-    if (options.minDate && moment(newDate).isBefore(options.minDate)){
-      return moment(options.minDate);
+    if (passedOptions.minDate && moment(newDate).isBefore(passedOptions.minDate)){
+      return moment(passedOptions.minDate);
     }
 
-
-    else if(options.maxDate && moment(newDate).isAfter(options.maxDate)){
-      return moment(options.maxDate);
+    else if(passedOptions.maxDate && moment(newDate).isAfter(passedOptions.maxDate)){
+      return moment(passedOptions.maxDate);
     }
 
     return moment(newDate);
@@ -38,8 +39,22 @@ function dateRanger( options ) {
   let startDate = rangeTransformedDate(initialDate);
   let endDate = rangeTransformedDate(initialEndDate);
 
-  if ( delta && !isWithinMinDelta(startDate,endDate,delta) ){
-    endDate = moment(startDate).add(delta, 'days');
+  updateEndDate();
+
+  function updateEndDate() {
+
+    if ( delta && !isWithinMinDelta(startDate,endDate,delta) ){
+      endDate = moment(startDate).add(delta, 'days');
+    }
+
+  }
+
+  function updateStartDate() {
+
+    if ( delta && !isWithinMinDelta(endDate,startDate,delta) ){
+      startDate = moment(endDate).subtract(delta, 'days');
+    }
+
   }
 
   return {
@@ -55,7 +70,7 @@ function dateRanger( options ) {
       }
 
       startDate = rangeTransformedDate(newDate);
-
+      updateEndDate();
 
     },
 
@@ -78,6 +93,7 @@ function dateRanger( options ) {
       }
 
       endDate = rangeTransformedDate( newDate );
+      updateStartDate();
 
     },
 

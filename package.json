@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "jstransform --strip-types --harmony --watch src/ build/",
-    "test": "mocha build/index.test.js -w"
+    "test": "mocha --compilers js:babel/register build/index.test.js -w"
   },
   "repository": {
     "type": "git",
@@ -27,5 +27,8 @@
   "homepage": "https://github.com/admmasters/date-ranger#readme",
   "dependencies": {
     "moment": "^2.10.6"
+  },
+  "devDependencies": {
+    "babel": "^5.8.29"
   }
 }
