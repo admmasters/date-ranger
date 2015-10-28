@@ -18,6 +18,7 @@ function dateRanger( options ) {
 
   let initialDate = moment( options.startDate || new Date());
   let initialEndDate = moment( options.endDate || new Date());
+  let delta = options.minDelta;
 
   let rangeTransformedDate = ( newDate )=> {
 
@@ -34,12 +35,12 @@ function dateRanger( options ) {
 
   };
 
-  let checkStartDate = ()=> {
-
-  };
-
   let startDate = rangeTransformedDate(initialDate);
   let endDate = rangeTransformedDate(initialEndDate);
+
+  if ( delta && !isWithinMinDelta(startDate,endDate,delta) ){
+    endDate = moment(startDate).add(delta, 'days');
+  }
 
   return {
 
@@ -89,6 +90,13 @@ function dateRanger( options ) {
     }
 
   };
+
+}
+
+function isWithinMinDelta( date1, date2, delta ) {
+
+  let dateDelta = date1.diff(date2, 'days');
+  return Math.abs(dateDelta) <= delta;
 
 }
 

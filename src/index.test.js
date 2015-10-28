@@ -3,7 +3,7 @@ var dateRanger = require('./index');
 
 describe('date-ranger', function(){
 
-  describe('constructor', function(){
+  describe('#contructor(options)', function(){
 
     it('should have a default start date', function(){
       var ranger = dateRanger({});
@@ -39,8 +39,8 @@ describe('date-ranger', function(){
 
       var ranger = dateRanger({ minDate, startDate, endDate });
 
-      expect( ranger ).to.satisfy((startDate)=>matchDate(ranger.startDate,minDate));
-      expect( ranger ).to.satisfy((startDate)=>matchDate(ranger.endDate,minDate));
+      expect( ranger ).to.satisfy( ranger => matchDate(ranger.startDate,minDate));
+      expect( ranger ).to.satisfy( ranger => matchDate(ranger.endDate,minDate));
 
     });
 
@@ -52,28 +52,26 @@ describe('date-ranger', function(){
 
       var ranger = dateRanger({ maxDate, startDate, endDate });
 
-      expect( ranger ).to.satisfy((startDate)=>matchDate(ranger.startDate,maxDate));
-      expect( ranger ).to.satisfy((startDate)=>matchDate(ranger.endDate,maxDate));
+      expect( ranger ).to.satisfy( ranger => matchDate(ranger.startDate,maxDate));
+      expect( ranger ).to.satisfy( ranger => matchDate(ranger.endDate,maxDate));
 
     });
 
     it('should be able to respect a delta between the two dates', function(){
 
-      var maxDate = new Date('2015-12-24');
+      var minDelta = 7;
       var startDate = new Date('2016-12-15');
-      var endDate = new Date('2016-12-15');
+      var endDate = new Date('2017-12-25');
 
-      var ranger = dateRanger({ maxDate, startDate, endDate });
+      var ranger = dateRanger({ startDate, endDate, minDelta });
 
-      expect( ranger ).to.satisfy((startDate)=>matchDate(ranger.startDate,maxDate));
-      expect( ranger ).to.satisfy((startDate)=>matchDate(ranger.endDate,maxDate));
+      expect(ranger).to.satisfy( ranger =>{
+        return matchDate( ranger.endDate, new Date('2016-12-22') );
+      });
 
     });
 
-
-
   });
-
 
 });
 
