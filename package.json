@@ -1,0 +1,30 @@
+{
+  "name": "date-ranger",
+  "version": "0.0.1",
+  "description": "A simple utility that takes two dates and manages their deltas based upon some input parameters.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/admmasters/date-ranger.git"
+  },
+  "keywords": [
+    "Date",
+    "Simple",
+    "Simply",
+    "Range",
+    "Ranger",
+    "Delta"
+  ],
+  "author": "Matt Revell",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/admmasters/date-ranger/issues"
+  },
+  "homepage": "https://github.com/admmasters/date-ranger#readme",
+  "dependencies": {
+    "moment": "^2.10.6"
+  }
+}
