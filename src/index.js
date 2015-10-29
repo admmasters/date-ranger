@@ -16,44 +16,49 @@ const moment : moment.MomentStatic = require('moment');
  */
 function dateRanger( options ) {
 
-  let passedOptions = options || {};
+  const passedOptions = options || {};
 
-  let initialDate = moment( passedOptions.startDate || new Date());
-  let initialEndDate = moment( passedOptions.endDate || new Date());
-  let delta = passedOptions.minDelta;
+  const delta = passedOptions.minDelta || 0;
 
-  let rangeTransformedDate = ( newDate )=> {
+  const minDate = moment( passedOptions.minDate );
+  const minEndDate = minDate.add( delta, 'days');
 
-    if (passedOptions.minDate && moment(newDate).isBefore(passedOptions.minDate)){
-      return moment(passedOptions.minDate);
-    }
+  const maxDate = moment( passedOptions.maxDate );
+  const maxStartDate = maxDate.subtract( delta, 'days');
 
-    else if(passedOptions.maxDate && moment(newDate).isAfter(passedOptions.maxDate)){
-      return moment(passedOptions.maxDate);
-    }
+  const initialDate = moment( passedOptions.startDate || new Date());
+  const initialEndDate = moment( passedOptions.endDate || new Date());
 
-    return moment(newDate);
+  const boundRangeTransformedDate = rangeTransformedDate.bind(null,options.minDate,options.maxDate);
+  const boundDeltaAdjustedMinEndDate = deltaAdjustedNewMinEndDate.bind(null,delta,minEndDate);
+  const boundDeltaAdjustedMaxStartDate = deltaAdjustedNewMaxStartDate.bind(null,delta,maxStartDate);
 
-  };
+  const lowerRangeDateProcessor = lowerRangeDate => moment(lowerRangeDate).add(delta, 'days');
+  const upperRangeDateProcessor = upperRangeDate => moment(upperRangeDate).subtract(delta, 'days');
 
-  let startDate = rangeTransformedDate(initialDate);
-  let endDate = rangeTransformedDate(initialEndDate);
+  let _startDate = boundRangeTransformedDate(initialDate);
+  let _endDate = boundRangeTransformedDate(initialEndDate);
 
   updateEndDate();
 
   function updateEndDate() {
 
-    if ( delta && !isWithinMinDelta(startDate,endDate,delta) ){
-      endDate = moment(startDate).add(delta, 'days');
+    if (moment(_startDate).isAfter(_endDate)){
+      _endDate = moment(_startDate);
     }
 
+    _endDate = updateDateWithDeltaFunc( _startDate, _endDate, { days: delta, process: lowerRangeDateProcessor });
+    _endDate = boundRangeTransformedDate(_endDate);
   }
 
   function updateStartDate() {
 
-    if ( delta && !isWithinMinDelta(endDate,startDate,delta) ){
-      startDate = moment(endDate).subtract(delta, 'days');
+    if (moment(_endDate).isBefore(_startDate)){
+      _startDate = moment(_endDate);
     }
+
+    _startDate = updateDateWithDeltaFunc( _endDate, _startDate, { days: delta, process: upperRangeDateProcessor });
+    _startDate = boundRangeTransformedDate(_startDate);
 
   }
 
@@ -69,7 +74,11 @@ function dateRanger( options ) {
         return;
       }
 
-      startDate = rangeTransformedDate(newDate);
+      if ( passedOptions.maxDate ){
+        newDate = boundDeltaAdjustedMaxStartDate(newDate);
+      }
+
+      _startDate = boundRangeTransformedDate(newDate);
       updateEndDate();
 
     },
@@ -79,7 +88,7 @@ function dateRanger( options ) {
      * @returns { Date }
      */
     get startDate() {
-      return moment(startDate).toDate();
+      return moment(_startDate).toDate();
     },
 
     /**
@@ -92,7 +101,12 @@ function dateRanger( options ) {
         return;
       }
 
-      endDate = rangeTransformedDate( newDate );
+      if ( passedOptions.minDate ) {
+        newDate = boundDeltaAdjustedMinEndDate(newDate);
+      }
+
+      _endDate = boundRangeTransformedDate(newDate);
+
       updateStartDate();
 
     },
@@ -102,17 +116,61 @@ function dateRanger( options ) {
      * @returns { Date }
      */
     get endDate() {
-      return moment(endDate).toDate();
+      return moment(_endDate).toDate();
     }
 
   };
 
 }
 
-function isWithinMinDelta( date1, date2, delta ) {
+function isViolatingMinDelta( date1, date2, delta ) {
 
   let dateDelta = date1.diff(date2, 'days');
-  return Math.abs(dateDelta) <= delta;
+  return Math.abs(dateDelta) < delta;
+
+}
+
+function rangeTransformedDate( minDate, maxDate, newDate ) {
+
+  if (minDate && moment(newDate).isBefore(minDate)){
+    return moment(minDate);
+  }
+
+  else if(maxDate && moment(newDate).isAfter(maxDate)){
+    return moment(maxDate);
+  }
+
+  return moment(newDate);
+
+}
+
+function updateDateWithDeltaFunc( date1, date2, deltaOptions ) {
+
+  if ( deltaOptions.days && isViolatingMinDelta( date1, date2, deltaOptions.days) ){
+    return deltaOptions.process(date1);
+  }
+
+  return date2;
+
+}
+
+function deltaAdjustedNewMinEndDate( delta, minEndDate, newDate ) {
+
+  if( delta > 0 &&  moment(newDate).isBefore(minEndDate) ){
+    newDate = minEndDate;
+  }
+
+  return newDate;
+
+}
+
+function deltaAdjustedNewMaxStartDate( delta, maxStartDate, newDate ) {
+
+  if( delta > 0 &&  moment(newDate).isAfter(maxStartDate) ){
+    newDate = maxStartDate;
+  }
+
+  return newDate;
 
 }
 

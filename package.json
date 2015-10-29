@@ -2,10 +2,10 @@
   "name": "date-ranger",
   "version": "0.0.1",
   "description": "A simple utility that takes two dates and manages their deltas based upon some input parameters.",
-  "main": "index.js",
+  "main": "build/index.js",
   "scripts": {
     "build": "jstransform --strip-types --harmony --watch src/ build/",
-    "test": "mocha --compilers js:babel/register build/index.test.js -w"
+    "test": "jstransform --strip-types --harmony --watch src/ build/ | mocha --compilers js:babel/register build/index.test.js -w"
   },
   "repository": {
     "type": "git",
@@ -29,6 +29,8 @@
     "moment": "^2.10.6"
   },
   "devDependencies": {
-    "babel": "^5.8.29"
+    "babel": "^5.8.29",
+    "chai": "^3.4.0",
+    "mocha": "^2.3.3"
   }
 }

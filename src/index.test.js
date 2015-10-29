@@ -2,7 +2,7 @@
 const chai = require('chai'), expect = chai.expect, should = chai.should();
 const dateRanger = require('./index');
 
-const DEBUG = false;
+const DEBUG = true;
 
 describe('date-ranger', ()=> {
 
@@ -16,6 +16,18 @@ describe('date-ranger', ()=> {
     it('should have a default end date', ()=> {
       const ranger = dateRanger({});
       should.exist(ranger.endDate);
+    });
+
+    it('should be earlier than the endDate', ()=> {
+
+      const startDate = new Date('2015-01-20')
+      const endDate = new Date('2015-01-01')
+      const ranger = dateRanger({ startDate, endDate });
+
+      expect(ranger).to.satisfy( ranger => {
+        return matchDate( ranger.startDate, ranger.endDate );
+      });
+
     });
 
     it('should be able to store the date passed to the start', ()=> {
@@ -64,7 +76,7 @@ describe('date-ranger', ()=> {
 
       const minDelta = 7;
       const startDate = new Date('2016-12-15');
-      const endDate = new Date('2017-12-25');
+      const endDate = new Date('2016-12-15');
 
       const ranger = dateRanger({ minDelta, startDate, endDate });
 
@@ -78,9 +90,23 @@ describe('date-ranger', ()=> {
 
   describe('#startDate', ()=> {
 
+    it('should be earlier than the endDate', ()=> {
+
+      const ranger = dateRanger({});
+      ranger.endDate = new Date('2015-01-01');
+      ranger.startDate = new Date('2015-01-20');
+
+
+      expect(ranger).to.satisfy( ranger => {
+        return matchDate( ranger.startDate, ranger.endDate );
+      });
+
+    });
+
     it('should be able to change the end date to startDate plus delta if out of range', ()=> {
 
       const ranger = dateRanger({ minDelta: 7 });
+      ranger.endDate = new Date('2016-12-15');
       ranger.startDate = new Date('2016-12-15');
 
       expect(ranger).to.satisfy( ranger =>{
@@ -116,6 +142,7 @@ describe('date-ranger', ()=> {
     it('should be able to respect a delta between the two dates', ()=> {
 
       const ranger = dateRanger({ minDelta: 7 });
+      ranger.endDate = new Date('2016-12-15');
       ranger.startDate = new Date('2016-12-15');
 
       expect(ranger).to.satisfy( ranger =>{
@@ -124,13 +151,39 @@ describe('date-ranger', ()=> {
 
     });
 
+    it('should be able to update endDate to endDate plus delta', ()=> {
+
+      const startDate = new Date('2015-11-30');
+      const endDate = new Date('2015-11-30');
+
+      const ranger = dateRanger({ startDate, endDate, minDelta: 7 });
+
+      expect(ranger).to.satisfy( ranger => {
+        return matchDate( ranger.endDate, new Date('2015-12-07') );
+      });
+
+    });
+
   });
 
   describe('#endDate', ()=> {
 
+    it('should be later than the startDate', ()=> {
+
+      const ranger = dateRanger({});
+      ranger.startDate = new Date('2015-01-20');
+      ranger.endDate = new Date('2015-01-01');
+
+      expect(ranger).to.satisfy( ranger => {
+        return matchDate( ranger.startDate, ranger.endDate );
+      });
+
+    });
+
     it('should be able to change the startDate to endDate minus delta if out of range', ()=> {
 
       const ranger = dateRanger({ minDelta: 7 });
+      ranger.startDate = new Date('2016-12-15');
       ranger.endDate = new Date('2016-12-15');
 
       expect(ranger).to.satisfy( ranger =>{
@@ -163,13 +216,17 @@ describe('date-ranger', ()=> {
 
     });
 
-    it('should be able to respect a delta between the two dates', ()=> {
+    it('should be able to update startDate to endDate minus delta if we are within the maxDate minus delta', ()=> {
 
-      const ranger = dateRanger({ minDelta: 7 });
-      ranger.endDate = new Date('2016-12-15');
+      const maxDate = new Date('2015-11-30');
+      const startDate = new Date('2015-11-30');
+      const endDate = new Date('2015-11-30');
 
-      expect(ranger).to.satisfy( ranger =>{
-        return matchDate( ranger.startDate, new Date('2016-12-8') );
+      const ranger = dateRanger({ maxDate, endDate, minDelta: 7 });
+      ranger.startDate = startDate;
+
+      expect(ranger).to.satisfy( ranger => {
+        return matchDate( ranger.startDate, new Date('2015-11-23') );
       });
 
     });
