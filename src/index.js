@@ -174,4 +174,21 @@ function deltaAdjustedNewMaxStartDate( delta, maxStartDate, newDate ) {
 
 }
 
+dateRanger.checkSlotIsWithinRange = function checkSlotIsWithinRange(slot, currentBooking) {
+
+  const slotStart = moment(slot.start);
+  const slotEnd = moment(slot.end);
+
+  const bookingStart = moment(currentBooking.start);
+  const bookingEnd = moment(currentBooking.end);
+
+  const slotStartIsBetweenBooking = slotStart.isBetween(bookingStart,bookingEnd);
+  const slotStartIsSameAsBooking = slotStart.isSame(bookingStart);
+
+  const slotEndIsBetweenBooking = slotEnd.isBetween(bookingStart,bookingEnd);
+
+  return slotStartIsBetweenBooking || slotStartIsSameAsBooking || slotEndIsBetweenBooking;
+
+};
+
 module.exports = dateRanger;

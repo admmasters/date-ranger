@@ -233,6 +233,59 @@ describe('date-ranger', ()=> {
 
   });
 
+  describe('#checkSlotIsWithinRange() it should be able to tell me whether a date range is within another date range', ()=>{
+
+    const booking = {
+      start: new Date('December 17, 1995 10:00:00'),
+      end: new Date('December 17, 1995 10:30:00')
+    };
+
+    it('should be within a range', ()=> {
+
+      const slot = {
+        start: new Date('December 17, 1995 10:00:00'),
+        end: new Date('December 17, 1995 10:30:00')
+      };
+
+      const result = dateRanger.checkSlotIsWithinRange( slot, booking );
+      expect(result).to.be.true;
+
+    });
+
+    it('should be outside of a range', ()=> {
+
+      const slot = {
+        start: new Date('December 17, 1995 09:00:00'),
+        end: new Date('December 17, 1995 09:30:00')
+      };
+
+      const result = dateRanger.checkSlotIsWithinRange( slot, booking );
+      expect(result).to.be.false;
+
+    });
+
+    it('should be outside while on the edge of the range', ()=> {
+
+      const slot1 = {
+        start: new Date('December 17, 1995 09:30:00'),
+        end: new Date('December 17, 1995 10:00:00')
+      };
+
+      const slot2 = {
+        start: new Date('December 17, 1995 10:30:00'),
+        end: new Date('December 17, 1995 11:00:00')
+      };
+
+      const result1 = dateRanger.checkSlotIsWithinRange( slot1, booking );
+      expect(result1).to.be.false;
+
+      const result2 = dateRanger.checkSlotIsWithinRange( slot2, booking );
+      expect(result2).to.be.false;
+
+    });
+
+  });
+
 });
 
 //Helpers
