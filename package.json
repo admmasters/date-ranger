@@ -29,8 +29,8 @@
     "moment": "^2.10.6"
   },
   "devDependencies": {
-    "babel": "^5.8.29",
-    "chai": "^3.4.0",
-    "mocha": "^2.3.3"
+    "babel": "^6.23.0",
+    "chai": "^4.2.0",
+    "mocha": "^6.1.4"
   }
 }
